@@ -12,3 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""A service to teach about services"""
+
+from importlib.metadata import version
+
+__version__ = version(__package__)

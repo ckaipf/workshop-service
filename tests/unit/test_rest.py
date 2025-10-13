@@ -13,8 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Short description of package."""  # Please adapt to package
+"""Unit tests for the HTTP API"""
 
-from importlib.metadata import version
+import pytest
+from ghga_service_commons.api.testing import AsyncTestClient
 
-__version__ = version(__package__)
+from tests.fixtures.config import get_config
+from ws1.inject import prepare_rest_app
+
+pytestmark = pytest.mark.asyncio()
+
+
+async def test_health():
+    """Test that the health endpoint returns a 200"""
+    config = get_config()
+    async with (
+        prepare_rest_app(config=config) as app,
+        AsyncTestClient(app=app) as rest_client,
+    ):
+        response = await rest_client.get("/health")
+        assert response.status_code == 200
