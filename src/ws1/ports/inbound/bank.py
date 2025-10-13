@@ -19,6 +19,8 @@ from abc import ABC, abstractmethod
 
 from pydantic import UUID4
 
+from ws1.models import BankAccount
+
 
 class BankPort(ABC):
     """An abstract definition of a bank class"""
@@ -31,15 +33,14 @@ class BankPort(ABC):
         """
 
     @abstractmethod
-    async def deposit(self, *, account_number: UUID4, amount: float) -> float:
-        """Register a deposit for the given account number.
+    async def credit(self, *, account_number: UUID4, amount: float) -> float:
+        """Register a credit for the given account number.
 
         Returns the current account balance as a float.
 
         Raises:
             `AccountNotFoundError`: If `account_number` does not match an existing
                 account.
-            `InvalidAmount`: If `amount` is positive.
         """
 
     @abstractmethod
@@ -51,12 +52,10 @@ class BankPort(ABC):
         Raises:
             `AccountNotFoundError`: If `account_number` does not match an existing
                 account.
-            `InvalidAmount`: If `amount` is negative.
         """
 
-    # TODO: Update this method signature with the appropriate model once defined
     @abstractmethod
-    async def get_account(self, *, account_number: UUID4) -> None:
+    async def get_account(self, *, account_number: UUID4) -> BankAccount:
         """Retrieve account info including the name and balance
 
         Raises:
