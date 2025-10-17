@@ -14,3 +14,37 @@
 # limitations under the License.
 
 """Concrete implementation of a Bank class"""
+
+
+from uuid import uuid4
+
+from pydantic import UUID4
+
+from ws1.models import BankAccount
+from ws1.ports.inbound.bank import BankPort
+from ws1.ports.outbound.DAO import AccountDaoPort
+
+
+class Bank(BankPort):
+    """Concrete implementation of a Bank class"""
+
+    def __init__(self, *, account_dao: AccountDaoPort) -> None:
+        self._account_dao = account_dao
+
+
+    async def create_account(self) -> UUID4:
+        """Establish an account for the given user with a balance of 0."""
+        account_id = uuid4()
+        bank_account = BankAccount(account_number=account_id, balance=0.0)
+        await self._account_dao.insert(bank_account)
+        print(f"Creating account for {account_id}")
+        return account_id
+
+    async def credit(self, *, account_number: UUID4, amount: float) -> float:
+        pass
+
+    async def debit(self, *, account_number: UUID4, amount: float) -> float:
+        pass
+
+    async def get_account(self, *, account_number: UUID4) -> float:
+        pass

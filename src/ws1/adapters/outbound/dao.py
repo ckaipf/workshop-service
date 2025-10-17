@@ -12,7 +12,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-port: 8084
-mongo_dsn: "mongodb://mongodb:27017"
-db_name: ws1
+
+"""Outbound adapters"""
+
+from hexkit.protocols.dao import DaoFactoryProtocol
+
+from ws1.models import BankAccount
+from ws1.ports.outbound.DAO import AccountDaoPort
+
+
+async def get_account_dao(dao_factory: DaoFactoryProtocol) -> AccountDaoPort:
+    """Get a DAO for BankAccount."""
+    return await dao_factory.get_dao(name="bank_accounts", dto_model=BankAccount, id_field="account_number")
 

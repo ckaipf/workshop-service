@@ -12,7 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-port: 8084
-mongo_dsn: "mongodb://mongodb:27017"
-db_name: ws1
 
+"""Outbound port definitions"""
+
+from hexkit.protocols.dao import Dao
+
+from ws1.models import BankAccount
+
+AccountDaoPort = Dao[BankAccount]

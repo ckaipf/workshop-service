@@ -26,7 +26,7 @@ class BankPort(ABC):
     """An abstract definition of a bank class"""
 
     @abstractmethod
-    async def create_account(self, *, name: str) -> UUID4:
+    async def create_account(self) -> UUID4:
         """Establish an account for the given user with a balance of 0.
 
         Returns the bank account number as a UUID4.

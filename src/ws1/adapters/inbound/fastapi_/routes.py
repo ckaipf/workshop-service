@@ -16,7 +16,11 @@
 
 """FastAPI endpoint function definitions"""
 
+from uuid import uuid4
+
 from fastapi import APIRouter, status
+
+from ws1.adapters.inbound.fastapi_.dummy import BankDummy
 
 router = APIRouter()
 
@@ -29,3 +33,24 @@ router = APIRouter()
 async def health():
     """Used to test if this service is alive"""
     return {"status": "OK"}
+
+
+@router.post(
+    "/accounts",
+    summary="Create account",
+    status_code=status.HTTP_200_OK,
+)
+async def create_account(bank: BankDummy):
+    """Used to create a new account"""
+    account_id = await bank.create_account()
+    return {"account_id": account_id}
+
+@router.get(
+    "/accounts/{account_id}",
+    summary="Get account",
+    status_code=status.HTTP_200_OK,
+)
+async def get_account(account_id: str):
+    """Used to get account details"""
+    return {"account_id": account_id}
+

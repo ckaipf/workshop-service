@@ -19,31 +19,38 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from hexkit.providers.mongodb.provider import MongoDbDaoFactory
 
+import ws1.adapters.inbound.fastapi_.dummy as dummies
+
+# from ws1.adapters.inbound.fastapi_ import dummies
 from ws1.adapters.inbound.fastapi_.configure import get_configured_app
+from ws1.adapters.outbound.dao import get_account_dao
 from ws1.config import Config
-
-# @asynccontextmanager
-# async def prepare_core(
-#     *,
-#     config: Config,
-#     account_dao_override: AccountDao | None = None,
-# ) -> AsyncGenerator[BankPort]:
-#     """Constructs and initializes all core components and their outbound dependencies.
-
-#     The _override parameter can be used to override the default dependencies.
-#     """
+from ws1.core.bank import Bank
+from ws1.ports.inbound.bank import BankPort
 
 
-# def prepare_core_with_override(
-#     *, config: Config, bank_override: BankPort | None = None
-# ):
-#     """Resolve the `bank_override` context manager based on config and override (if any)."""
-#     return (
-#         nullcontext(bank_override)
-#         if bank_override
-#         else prepare_core(config=config)
-#     )
+@asynccontextmanager
+async def prepare_core(
+    *,
+    config: Config,
+) -> AsyncGenerator[BankPort]:
+    async with MongoDbDaoFactory.construct(config=config) as dao_factory:
+        account_dao = await get_account_dao(dao_factory=dao_factory)
+        yield Bank(account_dao=account_dao)
+
+
+
+def prepare_core_with_override(
+    *, config: Config, bank_override: BankPort | None = None
+):
+    """Resolve the `bank_override` context manager based on config and override (if any)."""
+    return (
+        nullcontext(bank_override)
+        if bank_override
+        else prepare_core(config=config)
+    )
 
 
 @asynccontextmanager
@@ -53,4 +60,6 @@ async def prepare_rest_app(*, config: Config) -> AsyncGenerator[FastAPI]:
     provide them using the bank_override parameter.
     """
     app = get_configured_app(config=config)
-    yield app
+    async with prepare_core(config=config) as bank:
+        app.dependency_overrides[dummies.bank_port] = lambda: bank
+        yield app

@@ -17,13 +17,14 @@
 
 from ghga_service_commons.api import ApiConfigBase
 from hexkit.config import config_from_yaml
+from hexkit.providers.mongodb import MongoDbConfig
 from pydantic import Field
 
 SERVICE_NAME: str = "ws1"
 
 
 @config_from_yaml(prefix=SERVICE_NAME)
-class Config(ApiConfigBase):
+class Config(ApiConfigBase, MongoDbConfig):
     """Config parameters and their defaults."""
 
     service_name: str = Field(

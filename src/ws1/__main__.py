@@ -17,14 +17,27 @@
 
 import asyncio
 
-from ghga_service_commons.api import run_server
+from fastapi import FastAPI
+from ghga_service_commons.api import configure_app, run_server
+
+from ws1.adapters.inbound.fastapi_.routes import router
+from ws1.inject import prepare_rest_app
 
 from .config import CONFIG, Config
 
 
-def run(config: Config = CONFIG):
+async def run_rest_app():
+    config = CONFIG
+    print("Here")
+    async with prepare_rest_app(config=config) as app:
+        app.include_router(router)
+        configure_app(app, config=config)
+        await run_server(app, config=config)
+
+
+def run():
     """Run the service."""
-    asyncio.run(run_server(app="ws1.__main__:app", config=config))
+    asyncio.run(run_rest_app())
 
 
 if __name__ == "__main__":
